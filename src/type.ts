@@ -9,3 +9,7 @@ export type IntersectionType = {
 };
 
 export type PolygonType = { x: number; y: number }[];
+
+export type ControleTypeType = "PLAYER" | "AI";
+
+export type ColorType = "red" | "blue" | "green" | "yellow" | "black" | "white";

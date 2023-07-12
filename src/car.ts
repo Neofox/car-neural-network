@@ -1,6 +1,6 @@
 import { Controls } from "./controls";
 import { Sensor } from "./sensor";
-import { RoadBordersType } from "./type";
+import { ColorType, ControleTypeType, RoadBordersType } from "./type";
 import { isPointInPolygon } from "./utils";
 
 export class Car {
@@ -22,36 +22,45 @@ export class Car {
 
     angle: number;
 
-    sensor: Sensor;
+    sensor: Sensor | undefined;
 
     polygon: { x: number; y: number }[];
 
     damaged: boolean;
 
-    constructor(x: number, y: number, width: number, height: number) {
+    constructor(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        controlType: ControleTypeType,
+        maxSpeed: number = 5
+    ) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
 
         this.speed = 0;
-        this.acceleration = 0.5;
-        this.maxSpeed = 5;
-        this.friction = 0.05;
+        this.acceleration = 0.9;
+        this.maxSpeed = maxSpeed;
+        this.friction = 0.03;
         this.angle = 0;
 
         this.damaged = false;
 
-        this.sensor = new Sensor(this);
-        this.controls = new Controls();
+        if (controlType === "PLAYER") {
+            this.sensor = new Sensor(this);
+        }
+        this.controls = new Controls(controlType);
         this.polygon = this.#createPolygon();
     }
 
-    draw(ctx: CanvasRenderingContext2D): void {
+    draw(ctx: CanvasRenderingContext2D, color: ColorType): void {
         if (this.damaged) {
-            ctx.fillStyle = "red";
+            ctx.fillStyle = "grey";
         } else {
-            ctx.fillStyle = "black";
+            ctx.fillStyle = color;
         }
 
         ctx.beginPath();
@@ -62,16 +71,22 @@ export class Car {
         }
         ctx.fill();
 
-        this.sensor.draw(ctx);
+        if (this.sensor) {
+            this.sensor.draw(ctx);
+        }
     }
 
-    update(roadBorders: RoadBordersType[]): void {
+    update(roadBorders: RoadBordersType[], traffic: Car[]): void {
+        // console.log(this.speed);
         if (!this.damaged) {
             this.#move();
             this.polygon = this.#createPolygon();
-            this.damaged = this.#checkDamage(roadBorders);
+            this.damaged = this.#checkDamage(roadBorders, traffic);
         }
-        this.sensor.update(roadBorders);
+
+        if (this.sensor) {
+            this.sensor.update(roadBorders, traffic);
+        }
     }
 
     #move() {
@@ -133,9 +148,15 @@ export class Car {
         return points;
     }
 
-    #checkDamage(roadBorders: RoadBordersType[]): boolean {
+    #checkDamage(roadBorders: RoadBordersType[], traffic: Car[]): boolean {
         for (const border of roadBorders) {
             if (isPointInPolygon(this.polygon, border)) {
+                return true;
+            }
+        }
+
+        for (const car of traffic) {
+            if (car !== this && isPointInPolygon(this.polygon, car.polygon)) {
                 return true;
             }
         }

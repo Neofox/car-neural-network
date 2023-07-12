@@ -22,11 +22,11 @@ export class Sensor {
         this.readings = [];
     }
 
-    update(roadBorders: RoadBordersType[]): void {
+    update(roadBorders: RoadBordersType[], traffic: Car[]): void {
         this.#castRays();
         this.readings = [];
         for (const ray of this.rays) {
-            const reading = this.#getReading(ray, roadBorders)!;
+            const reading = this.#getReading(ray, roadBorders, traffic)!;
             this.readings.push(reading);
         }
     }
@@ -48,7 +48,7 @@ export class Sensor {
 
             ctx.beginPath();
             ctx.lineWidth = 2;
-            ctx.strokeStyle = "red";
+            ctx.strokeStyle = "black";
 
             ctx.moveTo(ray[1].x, ray[1].y);
             ctx.lineTo(end.x, end.y);
@@ -78,13 +78,25 @@ export class Sensor {
         }
     }
 
-    #getReading(ray: RayType[], roadBorders: RoadBordersType[]): IntersectionType | null {
+    #getReading(ray: RayType[], roadBorders: RoadBordersType[], traffic: Car[]): IntersectionType | null {
         let intersections = [];
 
+        // check for road collisions
         for (const border of roadBorders) {
             const intersection = getIntersection(ray[0], ray[1], border[0], border[1]);
             if (intersection) {
                 intersections.push(intersection);
+            }
+        }
+
+        // check for traffic collisions
+        for (const car of traffic) {
+            const poly = car.polygon;
+            for (let index = 0; index < poly.length; index++) {
+                const intersection = getIntersection(ray[0], ray[1], poly[index], poly[(index + 1) % poly.length]);
+                if (intersection) {
+                    intersections.push(intersection);
+                }
             }
         }
 

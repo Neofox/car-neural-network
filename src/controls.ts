@@ -1,17 +1,21 @@
-export class Controls {
+import { ControleTypeType } from "./type";
 
+export class Controls {
     forward: boolean = false;
     left: boolean = false;
     right: boolean = false;
     reverse: boolean = false;
 
-    constructor(forward: boolean = false, left: boolean = false, right: boolean = false, reverse: boolean = false) {
-        this.forward = forward;
-        this.left = left;
-        this.right = right;
-        this.reverse = reverse;
-
-        this.#addKeyboardListeners();
+    constructor(controlType: ControleTypeType) {
+        switch (controlType) {
+            case "PLAYER": {
+                this.#addKeyboardListeners();
+                break;
+            }
+            case "AI": {
+                this.forward = true;
+            }
+        }
     }
 
     #addKeyboardListeners(): void {
@@ -34,7 +38,7 @@ export class Controls {
                     break;
                 }
             }
-        })
+        });
 
         document.addEventListener("keyup", e => {
             switch (e.key) {
@@ -55,6 +59,6 @@ export class Controls {
                     break;
                 }
             }
-        })
+        });
     }
 }
