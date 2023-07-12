@@ -36,7 +36,7 @@ export class Car {
 
         this.speed = 0;
         this.acceleration = 0.5;
-        this.maxSpeed = 10;
+        this.maxSpeed = 5;
         this.friction = 0.05;
         this.angle = 0;
 
@@ -48,6 +48,12 @@ export class Car {
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
+        if (this.damaged) {
+            ctx.fillStyle = "red";
+        } else {
+            ctx.fillStyle = "black";
+        }
+
         ctx.beginPath();
         ctx.moveTo(this.polygon[0].x, this.polygon[0].y);
         for (let index = 1; index < this.polygon.length; index++) {
@@ -60,11 +66,11 @@ export class Car {
     }
 
     update(roadBorders: RoadBordersType[]): void {
-        this.#move();
-
-        this.polygon = this.#createPolygon();
-        this.damaged = this.#checkDamage(roadBorders);
-
+        if (!this.damaged) {
+            this.#move();
+            this.polygon = this.#createPolygon();
+            this.damaged = this.#checkDamage(roadBorders);
+        }
         this.sensor.update(roadBorders);
     }
 
@@ -79,10 +85,10 @@ export class Car {
         const flip = this.speed > 0;
 
         if (this.controls.left && this.speed != 0) {
-            this.angle += flip ? 0.04 : -0.02;
+            this.angle += flip ? 0.02 : -0.02;
         }
         if (this.controls.right && this.speed != 0) {
-            this.angle -= flip ? 0.04 : -0.02;
+            this.angle -= flip ? 0.02 : -0.02;
         }
 
         // limit speed
