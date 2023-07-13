@@ -20,9 +20,14 @@ body {
   text-align: center;
 }
 
-canvas {
+#carCanvas {
   background-color: lightblue;
 }
+
+#networkCanvas {
+  background-color: black;
+}
+
 
 @media (prefers-color-scheme: light) {
   :root {

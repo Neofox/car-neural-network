@@ -95,3 +95,22 @@ export function isPointInPolygon(poly1: PolygonType, poly2: PolygonType): boolea
     }
     return false;
 }
+
+/**
+ * Get RGBA color
+ * @param value
+ * @returns
+ * @see https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
+ * @see https://stackoverflow.com/questions/21646738/convert-hex-to-rgba
+ *
+ * @example
+ * const color = getRGBA(0.5);
+ * // rgba(255,255,0,0.5)
+ */
+export function getRGBA(value: number) {
+    const alpha = Math.abs(value);
+    const R = value < 0 ? 0 : 255;
+    const G = R;
+    const B = value > 0 ? 0 : 255;
+    return "rgba(" + R + "," + G + "," + B + "," + alpha + ")";
+}
