@@ -1,3 +1,5 @@
+import { lerp } from "./utils";
+
 export class NeuralNetwork {
     levels: Level[]; // levels[i] is the ith level of the network
 
@@ -23,6 +25,22 @@ export class NeuralNetwork {
 
         // return the output of the network (the output of the last level)
         return outputs;
+    }
+
+    // mutate the network
+    // mutationRate is the probability that a weight or bias will be mutated
+    static mutate(network: NeuralNetwork, mutationRate: number = 1): void {
+        // mutate the weights and biases of the network
+        network.levels.forEach(level => {
+            level.biases.forEach((bias, i) => {
+                level.biases[i] = lerp(bias, Math.random() * 2 - 1, mutationRate);
+            });
+            level.weights.forEach((weight, i) => {
+                weight.forEach((w, j) => {
+                    level.weights[i][j] = lerp(w, Math.random() * 2 - 1, mutationRate);
+                });
+            });
+        });
     }
 }
 
