@@ -1,4 +1,5 @@
 import { Controls } from "./controls";
+import { NeuralNetwork } from "./network";
 import { Sensor } from "./sensor";
 import { ColorType, ControleTypeType, RoadBordersType } from "./type";
 import { isPointInPolygon } from "./utils";
@@ -22,11 +23,13 @@ export class Car {
 
     angle: number;
 
-    sensor: Sensor | undefined;
-
     polygon: { x: number; y: number }[];
 
     damaged: boolean;
+
+    sensor: Sensor | undefined;
+    brain: NeuralNetwork | undefined;
+    useBrain: boolean;
 
     constructor(
         x: number,
@@ -49,8 +52,11 @@ export class Car {
 
         this.damaged = false;
 
-        if (controlType === "PLAYER") {
+        this.useBrain = controlType === "AI";
+
+        if (controlType === "PLAYER" || controlType === "AI") {
             this.sensor = new Sensor(this);
+            this.brain = new NeuralNetwork([this.sensor.rayCount, 6, 4]);
         }
         this.controls = new Controls(controlType);
         this.polygon = this.#createPolygon();
@@ -86,6 +92,16 @@ export class Car {
 
         if (this.sensor) {
             this.sensor.update(roadBorders, traffic);
+            const offsets = this.sensor.readings.map(sensor => (sensor === null ? 0 : 1 - sensor.offset));
+            const outputs = NeuralNetwork.feedForward(offsets, this.brain!);
+            console.log(outputs);
+
+            if (this.useBrain) {
+                this.controls.forward = outputs[0] > 0.5;
+                this.controls.left = outputs[1] > 0.5;
+                this.controls.right = outputs[2] > 0.5;
+                this.controls.reverse = outputs[3] > 0.5;
+            }
         }
     }
 

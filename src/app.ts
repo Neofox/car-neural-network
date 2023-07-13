@@ -3,13 +3,13 @@ import { Road } from "./road";
 
 // https://www.youtube.com/watch?v=Rs_rAxEsAvI
 
-const canvas = document.querySelector<HTMLCanvasElement>("#myCanvas")!;
+const canvas = document.querySelector<HTMLCanvasElement>("#carCanvas")!;
 canvas.width = 200;
 
 const ctx = canvas.getContext("2d")!;
 const road = new Road(canvas.width / 2, canvas.width * 0.9);
-const mainCar = new Car(road.getLaneCenter(1), 400, 30, 50, "PLAYER", 5);
-const traffic = [new Car(road.getLaneCenter(2), 200, 30, 50, "AI", 1)];
+const mainCar = new Car(road.getLaneCenter(1), 400, 30, 50, "AI", 5);
+const traffic = [new Car(road.getLaneCenter(1), 200, 30, 50, "NONE", 1)];
 
 const animate = (): void => {
     canvas.height = window.innerHeight; // resize canvas to fit the screen

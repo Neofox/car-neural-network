@@ -12,7 +12,7 @@ export class Controls {
                 this.#addKeyboardListeners();
                 break;
             }
-            case "AI": {
+            case "NONE": {
                 this.forward = true;
             }
         }

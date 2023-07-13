@@ -10,6 +10,13 @@ export type IntersectionType = {
 
 export type PolygonType = { x: number; y: number }[];
 
-export type ControleTypeType = "PLAYER" | "AI";
+export type ControleTypeType = "PLAYER" | "AI" | "NONE";
 
 export type ColorType = "red" | "blue" | "green" | "yellow" | "black" | "white";
+
+export type NeuronType = {
+    inputs: number[];
+    outputs: number[];
+    biases: number[];
+    weights: number[][];
+};
