@@ -62,7 +62,7 @@ export class Car {
         this.polygon = this.#createPolygon();
     }
 
-    draw(ctx: CanvasRenderingContext2D, color: ColorType): void {
+    draw(ctx: CanvasRenderingContext2D, color: ColorType, drawSensor: boolean = false): void {
         if (this.damaged) {
             ctx.fillStyle = "grey";
         } else {
@@ -77,13 +77,12 @@ export class Car {
         }
         ctx.fill();
 
-        if (this.sensor) {
+        if (this.sensor && drawSensor) {
             this.sensor.draw(ctx);
         }
     }
 
     update(roadBorders: RoadBordersType[], traffic: Car[]): void {
-        // console.log(this.speed);
         if (!this.damaged) {
             this.#move();
             this.polygon = this.#createPolygon();
@@ -94,7 +93,6 @@ export class Car {
             this.sensor.update(roadBorders, traffic);
             const offsets = this.sensor.readings.map(sensor => (sensor === null ? 0 : 1 - sensor.offset));
             const outputs = NeuralNetwork.feedForward(offsets, this.brain!);
-            console.log(outputs);
 
             if (this.useBrain) {
                 this.controls.forward = outputs[0] > 0.5;
